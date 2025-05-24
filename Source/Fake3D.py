@@ -74,7 +74,7 @@ class Grid():
                 if self.grid[x][y] == 1:
                     topleft = (self.tilesize * y, self.tilesize * x)
                     rect = pygame.Rect(topleft[0], topleft[1], self.tilesize, self.tilesize)
-                    pygame.draw.rect(screen, (40, 40, 40), rect)
+                    pygame.draw.rect(screen, (150, 150, 150), rect)
                     self.rects.append(rect)
 
 class Player():
@@ -83,9 +83,9 @@ class Player():
         self.pos = pos
         self.angle = 60
 
-        self.fov = 100
+        self.fov = 90
         self.verticalFov = 7200
-        self.numOfRays = 600
+        self.numOfRays = 300
         self.raysWidth = screenWidth/self.numOfRays/2
         self.rayLength = 600
 
