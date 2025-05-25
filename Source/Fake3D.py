@@ -13,14 +13,18 @@ clock = pygame.time.Clock()
 
 font = pygame.font.SysFont(None, 25)
 def displayFPS(screen):
-    fps = int(clock.get_fps())
+    fps = round(clock.get_fps(), 1)
     fps_text = font.render(f"FPS: {fps}", True, (255, 255, 255))  # White text
     screen.blit(fps_text, (10, 10))  # Top-left corner with slight padding
 
-#debug toggle
-debug1 = True
-debug2 = False
-debug3 = True
+#debug toggles and preferences
+debug1 = False  #draw grid lines
+debug2 = False  #draw all cast rays
+debug3 = True   #draw grid              #note: draw grid disabled also disables draw grid lines
+debug4 = False  #draw crosshair
+
+allow1 = False  #sprint on shift
+allow2 = False   #walk through walls
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,26 +36,26 @@ class Grid():
         self.rects = []
 
         self.grid = [
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,1,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0],
-            [0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0],
-            [0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0],
-            [0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0],
-            [0,0,1,1,0,1,1,1,1,1,1,1,0,1,1,0,0,1,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,1,1,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
-            [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-            [0,0,0,1,1,0,1,1,1,0,1,1,0,0,0,1,0,0,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,1,1,0,1,1,0,0,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0],
-            [0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,1],
+            [1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1],
+            [1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1],
+            [1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1],
+            [1,0,1,1,0,1,1,1,1,1,1,1,0,1,1,0,0,1,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,1,1,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1],
+            [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
+            [1,0,0,1,1,0,1,1,1,0,1,1,0,0,0,1,0,0,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,1,1,0,1,1,0,0,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
+            [1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ]
 
         #initial draw grid
@@ -85,9 +89,9 @@ class Player():
 
         self.fov = 90
         self.verticalFov = 7200
-        self.numOfRays = 300
+        self.numOfRays = 200
         self.raysWidth = screenWidth/self.numOfRays/2
-        self.rayLength = 600
+        self.rayLength = 180
 
         self.speed = 50
         self.walkSpeed = 50
@@ -104,20 +108,43 @@ class Player():
         v = (math.cos(angleRad), math.sin(angleRad))
         vMag = math.sqrt(v[0]**2 + v[1]**2)
         vNor = (v[0] / vMag, v[1] / vMag)
-        vFin = (vNor[0] * 15, vNor[1] * 15)
+        vFin = (vNor[0] * 8, vNor[1] * 8)
 
         pygame.draw.line(screen, (255, 255, 255), self.pos, (self.pos[0] + vFin[0], self.pos[1] + vFin[1]), 3)
 
-    def move(self, deltaTime, vDir):
+    def move(self, deltaTime, vDir, grid):
         #rotate vDir by angle for ralative to player
         angleRad = math.radians(self.angle)
         xRot = vDir[0] * math.cos(angleRad) - vDir[1] * math.sin(angleRad)
         yRot = vDir[0] * math.sin(angleRad) + vDir[1] * math.cos(angleRad)
         vRel = (xRot, yRot)
 
-        #apply movement vector * deltatime
-        self.pos = (self.pos[0] + vRel[0] * deltaTime * self.speed, self.pos[1] + vRel[1] * deltaTime * self.speed)
+        #movement without collision
+        nextPos = (self.pos[0] + vRel[0] * deltaTime * self.speed, self.pos[1] + vRel[1] * deltaTime * self.speed)
+        
+        if allow2: self.pos = nextPos
+        else:
+            #check for collision, get grid coords
+            gX = math.floor(self.pos[0] // grid.tilesize)
+            gY = math.floor(self.pos[1] // grid.tilesize)
 
+            #get next pos grid cords
+            ngX = math.floor(nextPos[0] // grid.tilesize)
+            ngY = math.floor(nextPos[1] // grid.tilesize)
+
+            #if next is equal to curr, move
+            if (ngX, ngY) == (gX, gY):
+                self.pos = nextPos
+
+            else:
+                #if next is inside grid
+                if ngX > 0 and ngX < len(grid.grid) - 1 and ngY > 0 and ngY < len(grid.grid) - 1:
+                    
+                    #if tile is empty
+                    if grid.grid[ngY][ngX] == 0:
+                        #move
+                        self.pos = nextPos
+            
     def turn(self):
         #mouse turn
         pygame.mouse.set_visible(False)
@@ -181,7 +208,11 @@ class Player():
                 closestMag = math.sqrt(closestMagSqrd)
 
                 #get color
-                newColor = (255 - 255 * (closestMag/self.rayLength), 255 - 255 * (closestMag/self.rayLength), 255 - 255 * (closestMag/self.rayLength))
+                ratio = closestMag/self.rayLength
+                if ratio > 1: ratio = 1
+                grayColor = 255 - 255 * ratio
+
+                newColor = (grayColor, grayColor, grayColor)
                 drawQueueColors.append(newColor)
 
                 #get rect
@@ -196,8 +227,7 @@ class Player():
         #draw to viewport
 
         #draw different color ground and sky
-        pygame.draw.rect(screen, (120, 120, 120), pygame.Rect(screenWidth/2, 0, screenWidth/2, screenHeight/2))
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(screenWidth/2, screenHeight/2, screenWidth/2, screenHeight/2))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(screenWidth/2, 0, screenWidth/2, screenHeight))
 
         #draw queued rays
         for i in range(len(drawQueueRects)):
@@ -208,7 +238,7 @@ class Player():
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
 grid = Grid()
-player = Player((30, 30))
+player = Player((45, 45))
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -233,7 +263,7 @@ while running:
                 running = False
 
             if event.key == pygame.K_LSHIFT:
-                player.speed = player.sprintSpeed
+                if allow1: player.speed = player.sprintSpeed
         
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LSHIFT:
@@ -243,13 +273,13 @@ while running:
 
     #move
     if keys[pygame.K_w]:
-        player.move(dTs, (1, 0))
+        player.move(dTs, (1, 0), grid)
     if keys[pygame.K_a]:
-        player.move(dTs, (0, -1))
+        player.move(dTs, (0, -0.7), grid)
     if keys[pygame.K_s]:
-        player.move(dTs, (-1, 0))
+        player.move(dTs, (-0.5, 0), grid)
     if keys[pygame.K_d]:  
-        player.move(dTs, (0, 1))
+        player.move(dTs, (0, 0.7), grid)
 
     #turn
     player.turn()
@@ -267,7 +297,7 @@ while running:
     player.CastRays(grid)
 
     #draw crosshair
-    pygame.draw.circle(screen, (255, 0, 0), (screenWidth / 2 + screenWidth/4, screenHeight / 2), 4, 2)
+    if debug4: pygame.draw.circle(screen, (255, 0, 0), (screenWidth / 2 + screenWidth/4, screenHeight / 2), 4, 2)
 
     # Update the display (buffer flip)
     displayFPS(screen)
