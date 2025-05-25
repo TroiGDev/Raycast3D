@@ -18,12 +18,12 @@ def displayFPS(screen):
     screen.blit(fps_text, (10, 10))  # Top-left corner with slight padding
 
 #debug toggles and preferences
-debug1 = False  #draw grid lines
+debug1 = True  #draw grid lines
 debug2 = False  #draw all cast rays
 debug3 = True   #draw grid              #note: draw grid disabled also disables draw grid lines
-debug4 = False  #draw crosshair
+debug4 = True  #draw crosshair
 
-allow1 = False  #sprint on shift
+allow1 = True  #sprint on shift
 allow2 = False   #walk through walls
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
